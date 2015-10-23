@@ -6,7 +6,8 @@
 \usage{
 votings_update_table(dbname, user, password, host,
   home_page='http://www.sejm.gov.pl/Sejm7.nsf/', page=
-  'http://www.sejm.gov.pl/Sejm7.nsf/agent.xsp?symbol=posglos&NrKadencji=7')
+  'http://www.sejm.gov.pl/Sejm7.nsf/agent.xsp?symbol=posglos&NrKadencji=7',
+  verbose=FALSE)
 }
 \arguments{
 \item{dbname}{name of database}
@@ -22,6 +23,8 @@ votings_update_table(dbname, user, password, host,
 \item{page}{page with votings in polish diet:
 http://www.sejm.gov.pl/Sejm7.nsf/agent.xsp?
 symbol=posglos&NrKadencji=7}
+
+\item{verbose}{if TRUE then additional info will be printed}
 }
 \value{
 invisible NULL

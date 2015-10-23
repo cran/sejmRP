@@ -12,7 +12,7 @@ about votings and deputies in actual term of office. All data is storaged in dat
 # Installation
 
 To get started, install the latest version of **sejmRP** from CRAN:
-```{r,eval=FALSE}
+```{r, eval = FALSE}
 install.packages("sejmRP")
 ```
 
@@ -53,8 +53,8 @@ install.packages("sejmRP")
 # How to create and update tables in database
 
 At the begining we need to create a database. For this purpose we use:
-```{r,eval=FALSE}
-create_database(dbname,user,password,host)
+```{r, eval = FALSE}
+create_database(dbname, user, password, host)
 ```
 
 where
@@ -87,76 +87,79 @@ After that we will get four tables:
     1) *id_statement* - statement's id,
     2) *surname_name* - author of statement,
     3) *date_statement* - statement's date,
-    4) *statement* - content of statement.
+    4) *titles_order_points* - title of order points,
+    5) *statement* - content of statement.
 
 \newpage    
 Now when we have empty database, we can start completing it with data. First of all we complete the *deputies* table.
 To do that we use:
-```{r,eval=FALSE}
-deputies_create_table(dbname,user,password,host)
+```{r, eval = FALSE}
+deputies_create_table(dbname, user, password, host)
 ```
 This function scraps active and inactive deputies' data from Polish Diet's webpage and put it to the table.
 In the case of you want get only deputies' data you can use:
 
-```{r,eval=FALSE}
+```{r, eval = FALSE}
 deputies_get_data(type)
 ```
 where you can choose between active and inactive deputies.
 To update *deputies* table use:
-```{r,eval=FALSE}
-deputies_update_table(dbname,user,password,host)
+```{r, eval = FALSE}
+deputies_update_table(dbname, user, password, host)
 ```
 
 After that we should complete *votings* table with:
-```{r,eval=FALSE}
-votings_create_table(dbname,user,password,host,
-  home_page="http://www.sejm.gov.pl/Sejm7.nsf/",
-  page="http://www.sejm.gov.pl/Sejm7.nsf/agent.xsp?symbol=posglos&NrKadencji=7")
+```{r, eval = FALSE}
+votings_create_table(dbname, user, password, host,
+  home_page = "http://www.sejm.gov.pl/Sejm7.nsf/",
+  page = "http://www.sejm.gov.pl/Sejm7.nsf/agent.xsp?symbol=posglos&NrKadencji=7")
 ```
 This function scraps all information about votings from [http://www.sejm.gov.pl/Sejm7.nsf/agent.xsp?symbol=posglos&NrKadencji=7](http://www.sejm.gov.pl/Sejm7.nsf/agent.xsp?symbol=posglos&NrKadencji=7). If you want update *votings* table, try:
-```{r,eval=FALSE}
-votings_update_table(dbname,user,password,host,
-  home_page="http://www.sejm.gov.pl/Sejm7.nsf/",
-  page="http://www.sejm.gov.pl/Sejm7.nsf/agent.xsp?symbol=posglos&NrKadencji=7")
+```{r, eval = FALSE}
+votings_update_table(dbname, user, password, host,
+  home_page = "http://www.sejm.gov.pl/Sejm7.nsf/",
+  page = "http://www.sejm.gov.pl/Sejm7.nsf/agent.xsp?symbol=posglos&NrKadencji=7")
 ```
 
 If you are interested in extra information, you can use additional functions:
-```{r,eval=FALSE}
+```{r, eval = FALSE}
 votings_get_meetings_table(
-  page="http://www.sejm.gov.pl/Sejm7.nsf/agent.xsp?symbol=posglos&NrKadencji=7")
+  page = "http://www.sejm.gov.pl/Sejm7.nsf/agent.xsp?symbol=posglos&NrKadencji=7")
 votings_get_votings_table(page)
 ```
 First of them enables downloading table with information about meetings during diet's term of office. The second one does the same with votings during meeting.
 
 Then we need to complete *votes* table. To do that we use:
-```{r,eval=FALSE}
-votes_create_table(dbname,user,password,host,
-  home_page="http://www.sejm.gov.pl/Sejm7.nsf/",windows=TRUE)
+```{r, eval = FALSE}
+votes_create_table(dbname, user, password, host,
+  home_page = "http://www.sejm.gov.pl/Sejm7.nsf/", 
+  windows = .Platform$OS.type == 'windows')
 ```
 The last argument says function if you use Windows, because of encoding issue on this operating system.
 
 To update *votes* table use:
-```{r,eval=FALSE}
-votes_update_table(dbname,user,password,host,
-  home_page="http://www.sejm.gov.pl/Sejm7.nsf/",windows=TRUE)
+```{r, eval = FALSE}
+votes_update_table(dbname, user, password, host,
+  home_page = "http://www.sejm.gov.pl/Sejm7.nsf/", 
+  windows = .Platform$OS.type == 'windows')
 ```
 
 If you want to know how deputies from chosen club voted try:
-```{r,eval=FALSE}
+```{r, eval = FALSE}
 votes_get_results(page)
 ```
 As *page* argument you should put page with this club's voting's results ([example](http://www.sejm.gov.pl/Sejm7.nsf/agent.xsp?symbol=klubglos&IdGlosowania=43200&KodKlubu=PO)).
 
 Finally we should complete *statements* table with:
-```{r,eval=FALSE}
-statements_create_table(dbname,user,password,host,
-  home_page="http://www.sejm.gov.pl/Sejm7.nsf/")
+```{r, eval = FALSE}
+statements_create_table(dbname, user, password, host,
+  home_page = "http://www.sejm.gov.pl/Sejm7.nsf/")
 ```
 
 To update *statements* table use:
-```{r,eval=FALSE}
-statements_update_table(dbname,user,password,host,
-  home_page="http://www.sejm.gov.pl/Sejm7.nsf/")
+```{r, eval = FALSE}
+statements_update_table(dbname, user, password, host,
+  home_page = "http://www.sejm.gov.pl/Sejm7.nsf/")
 ```
 
 # How to read tables from database
@@ -169,15 +172,19 @@ First of all, we have to say that there are special parameters to read tables fr
 * *host* = 'services.mini.pw.edu.pl'.
 
 If you are only interested in tables, try:
-```{r,eval=FALSE}
-get_deputies_table(dbname='sejmrp',user='reader',password='qux94874', 
-  host='services.mini.pw.edu.pl',sorted_by_id=TRUE,windows=TRUE)
-get_votings_table(dbname='sejmrp',user='reader',password='qux94874', 
-  host='services.mini.pw.edu.pl',sorted_by_id=TRUE,windows=TRUE)
-get_votes_table(dbname='sejmrp',user='reader',password='qux94874', 
-  host='services.mini.pw.edu.pl',sorted_by_id=TRUE,windows=TRUE)
-get_statements_table(dbname='sejmrp',user='reader',password='qux94874', 
-  host='services.mini.pw.edu.pl',sorted_by_id=TRUE,windows=TRUE)
+```{r, eval = FALSE}
+get_deputies_table(dbname = 'sejmrp', user = 'reader', password = 'qux94874', 
+  host = 'services.mini.pw.edu.pl', sorted_by_id = TRUE,
+  windows = .Platform$OS.type == 'windows')
+get_votings_table(dbname = 'sejmrp', user = 'reader', password = 'qux94874', 
+  host = 'services.mini.pw.edu.pl', sorted_by_id = TRUE,
+  windows = .Platform$OS.type == 'windows')
+get_votes_table(dbname = 'sejmrp', user = 'reader', password = 'qux94874', 
+  host = 'services.mini.pw.edu.pl', sorted_by_id = TRUE,
+  windows = .Platform$OS.type == 'windows')
+get_statements_table(dbname = 'sejmrp', user = 'reader', password = 'qux94874', 
+  host = 'services.mini.pw.edu.pl', sorted_by_id = TRUE,
+  windows = .Platform$OS.type == 'windows')
 ```
 where 
 
@@ -186,19 +193,19 @@ where
 
 As you see all of the arguments are default, so you probably use this
 functions changing only *windows* argument, like:
-```{r,eval=FALSE}
+```{r, eval = FALSE}
 get_deputies_table()
-get_deputies_table(windows=FALSE)
+get_deputies_table(windows = FALSE)
 ```
 We do not recommend change *sorted_by_id* to *FALSE*, because data can be unsorted and
 there may occur some problems during analysis.
 
 There is also a function:
-```{r,eval=FALSE}
+```{r, eval = FALSE}
 get_filtered_votes(dbname = 'sejmrp', user = 'reader', password = 'qux94874',
-  host = 'services.mini.pw.edu.pl', windows = TRUE, clubs = character(0),
-  dates = character(0), meetings = integer(0), votings = integer(0),
-  deputies = character(0), topics = character(0))
+  host = 'services.mini.pw.edu.pl', windows = .Platform$OS.type == 'windows',
+  clubs = character(0), dates = character(0), meetings = integer(0), 
+  votings = integer(0), deputies = character(0), topics = character(0))
 ```
 that retrieves joined *deputies*, *votes* and *votings* tables
 with filtred data. As you see there are few possible filters:
@@ -229,13 +236,13 @@ words as patterns. For example if you want to find votings about education (in P
 szkolnictwo) try "szkolnictw". It is possible to choose more than one pattern.
 
 For example if you want to find every votings of deputies from PO and PiS during 2014 year try:
-```{r,eval=FALSE}
-get_filtered_votes(clubs = c("PO","PiS"), dates = c("2014-01-01","2014-12-31"))
-get_filtered_votes(windows = FALSE, clubs = c("PO","PiS"),
-  dates = c("2014-01-01","2014-12-31")) #Linux/Mac OS
+```{r, eval = FALSE}
+get_filtered_votes(clubs = c("PO", "PiS"), dates = c("2014-01-01", "2014-12-31"))
+get_filtered_votes(windows = FALSE, clubs = c("PO", "PiS"),
+  dates = c("2014-01-01", "2014-12-31")) #Linux/Mac OS
 ```
 or if you are looking only for votings with referendum use:
-```{r,eval=FALSE}
+```{r, eval = FALSE}
 get_filtered_votes(topics = "referendum")
 get_filtered_votes(windows = FALSE, topics = "referendum")  #Linux/Mac OS
 ```

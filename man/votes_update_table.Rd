@@ -6,7 +6,8 @@
 \usage{
 votes_update_table(dbname, user, password, host,
   home_page = 'http://www.sejm.gov.pl/Sejm7.nsf/',
-  windows = .Platform$OS.type == 'windows')
+  windows = .Platform$OS.type == 'windows',
+  verbose=FALSE)
 }
 \arguments{
 \item{dbname}{name of database}
@@ -21,6 +22,8 @@ votes_update_table(dbname, user, password, host,
 
 \item{windows}{information of used operation system;
 default: .Platform$OS.type == 'windows'}
+
+\item{verbose}{if TRUE then additional info will be printed}
 }
 \value{
 invisible NULL

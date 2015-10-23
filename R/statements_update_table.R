@@ -3,13 +3,15 @@
 #' Function \code{statements_update_table} updates a table with deputies' statements.
 #'
 #' @usage statements_update_table(dbname, user, password, host,
-#'   home_page = 'http://www.sejm.gov.pl/Sejm7.nsf/')
+#'   home_page = 'http://www.sejm.gov.pl/Sejm7.nsf/',
+#'   verbose=FALSE)
 #'
 #' @param dbname name of database
 #' @param user name of user
 #' @param password password of database
 #' @param host name of host
 #' @param home_page main page of polish diet: http://www.sejm.gov.pl/Sejm7.nsf/
+#' @param verbose if TRUE then additional info will be printed
 #'
 #' @return invisible NULL
 #'
@@ -25,7 +27,8 @@
 #' @export
 #'
 
-statements_update_table <- function(dbname, user, password, host, home_page = "http://www.sejm.gov.pl/Sejm7.nsf/") {
+statements_update_table <- function(dbname, user, password, host, home_page = "http://www.sejm.gov.pl/Sejm7.nsf/",
+                                    verbose=FALSE) {
     stopifnot(is.character(dbname), is.character(user), is.character(password), is.character(host), 
               is.character(home_page))
     
@@ -34,7 +37,7 @@ statements_update_table <- function(dbname, user, password, host, home_page = "h
     database_diet <- dbConnect(drv, dbname = dbname, user = user, password = password, host = host)
     last_id <- dbGetQuery(database_diet, "SELECT SUBSTRING(id_statement, '[0-9]+\\.[0-9]+') FROM statements")
     last_id <- max(as.numeric(last_id[, 1]))
-    ids_numbers <- unlist(stri_extract_all_regex(last_id, "[0-9]+"))
+    ids_numbers <- unlist(strsplit(as.character(last_id), split = "[^0-9]+"))
     dbSendQuery(database_diet, paste0("DELETE FROM statements WHERE id_statement SIMILAR TO '", 
                                       ids_numbers[1], "\\.", ids_numbers[2], "\\.[0-9]{3,4}'"))
     suppressWarnings(dbDisconnect(database_diet))
@@ -45,13 +48,22 @@ statements_update_table <- function(dbname, user, password, host, home_page = "h
         repeat {
             # get statements links of first new day of a meeting
             page <- paste0(home_page, "wypowiedz.xsp?posiedzenie=", nr_meeting, "&dzien=", nr_day, "&wyp=0")
-            stenogram <- html_nodes(html(page), ".stenogram")
+            if (verbose) {
+              cat("\nDownloading", page, "\n")
+            }
+            stenogram <- html_nodes(safe_html(page), ".stenogram")
             statements_links <- html_nodes(stenogram, "h2 a")
             
             # move to next day of meeting if empty page found
             if (length(statements_links) == 0) {
                 break
             }
+            
+            # get titles of order points during a meeting
+            page_meeting <- paste0(home_page, "posiedzenie.xsp?posiedzenie=", nr_meeting, "&dzien=", nr_day)
+            statements_table <- statements_get_statements_table(page_meeting)
+            if_deputy <- stri_detect_regex(statements_table[, 1], "(Pose.{1,2} )|(Minister )|([p|P]rezes Rady Ministr.{1,2} )")
+            titles_order_points <- statements_table[if_deputy, 3]
             
             # get date
             statements_date <- votings_get_date(page)
@@ -69,9 +81,18 @@ statements_update_table <- function(dbname, user, password, host, home_page = "h
             database_diet <- dbConnect(drv, dbname = dbname, user = user, password = password, host = host)
             
             for (i in seq_len(length(statements))) {
+                if (verbose) {
+                  cat(".")
+                }
                 id <- paste0(nr_meeting, ".", nr_day, ".", statements_data[i, 3])
-                dbSendQuery(database_diet, paste0("INSERT INTO statements (id_statement, surname_name, date_statement, statement)", 
-                  "VALUES ('", id, "','", statements_data[i, 1], "','", statements_date, "','", statements[i], "')"))
+                # remove '
+                statements_data[i, 1] <- gsub(statements_data[i, 1], pattern = "'", replacement = "")
+                titles_order_points[i] <- gsub(titles_order_points[i], pattern = "'", replacement = "")
+                statements[i] <- gsub(statements[i] , pattern = "'", replacement = "")
+                
+                dbSendQuery(database_diet, paste0("INSERT INTO statements (id_statement, surname_name, date_statement, titles_order_points, ", 
+                  "statement) VALUES ('", id, "','", statements_data[i, 1], "','", statements_date, "','", titles_order_points[i], "','",
+                  statements[i], "')"))
             }
             
             suppressWarnings(dbDisconnect(database_diet))

@@ -5,7 +5,8 @@
 \title{Updating table with deputies' statements}
 \usage{
 statements_update_table(dbname, user, password, host,
-  home_page = 'http://www.sejm.gov.pl/Sejm7.nsf/')
+  home_page = 'http://www.sejm.gov.pl/Sejm7.nsf/',
+  verbose=FALSE)
 }
 \arguments{
 \item{dbname}{name of database}
@@ -17,6 +18,8 @@ statements_update_table(dbname, user, password, host,
 \item{host}{name of host}
 
 \item{home_page}{main page of polish diet: http://www.sejm.gov.pl/Sejm7.nsf/}
+
+\item{verbose}{if TRUE then additional info will be printed}
 }
 \value{
 invisible NULL

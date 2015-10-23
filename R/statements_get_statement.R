@@ -7,9 +7,10 @@
 #' Example of page with deputy's statement: 
 #' http://www.sejm.gov.pl/Sejm7.nsf/wypowiedz.xsp?posiedzenie=15&dzien=1&wyp=008
 #'
-#' @usage statements_get_statement(page)
+#' @usage statements_get_statement(page, ...)
 #'
 #' @param page deputy's statement's page
+#' @param ... other arguments, that will be passed to safe_html()
 #'
 #' @return character vector
 #'
@@ -27,11 +28,11 @@
 #' @export
 #'
 
-statements_get_statement <- function(page) {
+statements_get_statement <- function(page, ...) {
     stopifnot(is.character(page))
     
-    page <- html(page)
-    page <- html_nodes(page, ".stenogram p")
+    pageH <- safe_html(page, ...)
+    page <- html_nodes(pageH, ".stenogram p")
     
     # getting statement content
     statement <- html_text(page)

@@ -4,10 +4,12 @@
 \alias{statements_get_statement}
 \title{Getting statements}
 \usage{
-statements_get_statement(page)
+statements_get_statement(page, ...)
 }
 \arguments{
 \item{page}{deputy's statement's page}
+
+\item{...}{other arguments, that will be passed to safe_html()}
 }
 \value{
 character vector
